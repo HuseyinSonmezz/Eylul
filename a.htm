@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Orta Çerçevede Kalpler</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 150vh;
+            background: pink;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        .hearts-body {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: float 3s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-180px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+
+        .heart-frame {
+            position: relative;
+            width: 70%;
+            height: auto;
+            padding: 40px 20px;
+            background: #ffe0e0;
+            border: 2px solid #1411c0;
+            border-radius: 20px;
+            margin: 50px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .step-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1411c0;
+        }
+
+        .next-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background: rgb(255, 133, 204);
+            color: white;
+            border-style: inset;
+            border-color: deeppink;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .num-input {
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid rgb(0, 0, 0);
+            border-radius: 10px;
+            font-size: 18px;
+            width: 100px;
+            text-align: center;
+        }
+
+        .hearts-frame {
+            position: absolute;
+            font-size: 22px;
+            pointer-events: none;
+            animation: fade 2s linear forwards;
+        }
+
+        @keyframes fade {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-40px); }
+        }
+
+        #resultArea {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #1411c0;
+        }
+
+        .choice-btn {
+            padding: 8px 15px;
+            font-size: 16px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid deeppink;
+            background: rgb(255, 200, 220);
+            color: #1411c0;
+        }
+
+        .choice-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>Eylül'üm 🤍</h1>
+        <p>Senin için küçük bir oyun hazırladım. Uğurlu sayının 8 olduğunu biliyorum.
+            Bu yüzden bu oyunda da sonuç her zaman <b>8 çıkacaktır.</b> </p> 
+    </div>
+
+    <div class="heart-frame" id="gameBox">
+
+        <div id="stepText" class="step-text">
+            Aklından herhangi bir sayı tutmanı istiyorum. 🩵  
+        </div>
+
+        <button class="next-btn" id="nextBtn">Hazırım</button>
+
+        <div id="choiceArea" style="display:none;">
+            <span>Sonuç <b>8</b> değil mi?</span><br>
+            <button class="choice-btn" id="yesBtn">Hayır</button>
+            <button class="choice-btn" id="noBtn">Evet</button>
+        </div>
+
+        <div id="numberArea" style="display:none;">
+            <span>Başta tuttuğun sayıyı yazar mısın?</span><br>
+            <input type="number" id="userNumber" class="num-input"><br>
+            <button class="next-btn" id="submitNumber">Yazdım</button>
+        </div>
+
+        <div id="resultArea"></div>
+
+    </div>
+
+    <script>
+        /* BODY'DE UÇAN KALPLER */
+        function createBodyHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'hearts-body';
+            heart.textContent = '❤️';
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.top = Math.random() * window.innerHeight + 'px';
+            heart.style.animationDuration = 2 + Math.random() * 3 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createBodyHeart, 400);
+
+        /* ÇERÇEVEDE FAREYİ TAKİP EDEN KALPLER */
+        const frame = document.querySelector(".heart-frame");
+        frame.addEventListener("mousemove", (e) => {
+            const rect = frame.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const heart = document.createElement("div");
+            heart.className = "hearts-frame";
+            heart.textContent = "❤️";
+            heart.style.left = x + "px";
+            heart.style.top = y + "px";
+            frame.appendChild(heart);
+            setTimeout(() => heart.remove(), 2000);
+        });
+
+        /* OYUN WIZARD SİSTEMİ */
+        const stepText = document.getElementById("stepText");
+        const nextBtn = document.getElementById("nextBtn");
+        const choiceArea = document.getElementById("choiceArea");
+        const yesBtn = document.getElementById("yesBtn");
+        const noBtn = document.getElementById("noBtn");
+        const numberArea = document.getElementById("numberArea");
+        const submitNumber = document.getElementById("submitNumber");
+        const userNumber = document.getElementById("userNumber");
+        const resultArea = document.getElementById("resultArea");
+
+        let step = 0;
+        let initialNumber = 0;
+
+        nextBtn.addEventListener("click", () => {
+            step++;
+            if(step === 1){
+                stepText.innerHTML = "Tuttuğun sayıyı <b>2 ile çarpar mısın?</b> 💖";
+                nextBtn.textContent = "Çarptım";
+            }
+            else if(step === 2){
+                stepText.innerHTML = "Üzerine <b>16 ekleyebilir misin?</b> 💖";
+                nextBtn.textContent = "Ekledim";
+            }
+            else if(step === 3){
+                stepText.innerHTML = "<b>2’ye bölebilir misin?</b> 💖";
+                nextBtn.textContent = "Böldüm";
+            }
+            else if(step === 4){
+                stepText.innerHTML = "Başta tuttuğun sayıyı <b> elde ettiğin sonuçtan çıkarır mısın</b> 💖";
+                nextBtn.textContent = "Hazır";
+            }
+            else if(step === 5){
+                stepText.style.display = "none";
+                nextBtn.style.display = "none";
+                choiceArea.style.display = "block";
+            }
+        });
+
+        noBtn.addEventListener("click", () => {
+            // Reset
+            step = 0;
+            stepText.style.display = "block";
+            stepText.innerHTML = "Aklından herhangi bir sayı tutar mısın? 🩵";
+            nextBtn.style.display = "inline-block";
+            nextBtn.textContent = "Hazırım";
+            choiceArea.style.display = "none";
+            numberArea.style.display = "none";
+            resultArea.innerHTML = "";
+            userNumber.value = "";
+        });
+
+        yesBtn.addEventListener("click", () => {
+            choiceArea.style.display = "none";
+            numberArea.style.display = "block";
+        });
+
+        submitNumber.addEventListener("click", () => {
+            initialNumber = Number(userNumber.value);
+            if(isNaN(initialNumber)){
+                alert("Tuttuğun sayıyı yazar mısın?");
+                return;
+            }
+            numberArea.style.display = "none";
+            let log = `
+                <b>İşlemler:</b><br>
+                Başta tuttuğun sayı: ${initialNumber}<br>
+                1) 2 ile çarp → ${initialNumber*2}<br>
+                2) 16 ekle → ${initialNumber*2 + 16}<br>
+                3) 2’ye böl → ${(initialNumber*2 +16)/2}<br>
+                4) Başta tuttuğun sayıyı çıkar → 8 💖
+            `;
+            resultArea.innerHTML = log;
+        });
+    </script>
+</body>
+</html>
